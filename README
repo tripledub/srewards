@@ -1,0 +1,16 @@
+Steps to run:
+
+Bundle:
+$bundle
+
+Run Specs
+$bundle exec rspec -f d --color
+
+Example Usage
+reward_service = Sky::RewardsService.new('ACCOUNT_NUMBER1234', ['MOVIES', 'SPORTS'])
+reward_service.rewards(service)
+
+* service would be an instance of whatever handles the EligibilityService query
+* Injecting as a dependancy and passing it as an argument to the 'rewards' method to fit
+  the specifications as they state that the rewards service takes two arguments,
+  account_number and portfolio
