@@ -80,7 +80,7 @@ describe Sky::RewardsService do
 
       it "does not return any rewards" do
         reward_service = described_class.new(12345678,['MUSIC', 'SPORT'])
-        expect(reward_service.rewards(eligibility_service)).to be_nil
+        expect(reward_service.rewards(eligibility_service)).to eq("")
       end
     end
 

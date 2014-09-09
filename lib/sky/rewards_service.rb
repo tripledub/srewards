@@ -1,8 +1,6 @@
 module Sky
   class RewardsService
 
-    attr_reader :account_number, :portfolio
-
     def initialize(account_number, portfolio=[])
       @account_number = account_number
       @portfolio = portfolio
@@ -14,10 +12,19 @@ module Sky
       rescue Exception => e
       ensure
        return "INVALID_ACCOUNT_NUMBER" if e && e.is_a?(Sky::InvalidAccountNumberException)
+       return "" if e && e.is_a?(Sky::TechnicalFaliureException)
       end
     end
 
     private
+
+    def account_number
+      @account_number
+    end
+
+    def portfolio
+      @portfolio
+    end
 
     def eligible_rewards
       rewards = portfolio.inject({}) {|hash, value| hash[value] = available_rewards[value]; hash}
