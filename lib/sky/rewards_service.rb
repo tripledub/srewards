@@ -12,7 +12,6 @@ module Sky
       begin
         eligible_rewards if service.query(account_number) == "CUSTOMER_ELIGIBLE"
       rescue Exception => e
-        # raised = e.class
       ensure
        return "INVALID_ACCOUNT_NUMBER" if e && e.is_a?(Sky::InvalidAccountNumberException)
       end
