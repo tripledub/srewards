@@ -20,13 +20,7 @@ module Sky
 
     private
 
-    def account_number
-      @account_number
-    end
-
-    def portfolio
-      @portfolio
-    end
+    attr_reader :account_number, :portfolio
 
     def eligible_rewards
       rewards = portfolio.inject({}) {|hash, value| hash[value] = available_rewards[value]; hash}
