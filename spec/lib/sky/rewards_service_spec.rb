@@ -136,7 +136,7 @@ describe Sky::RewardsService do
 
       it 'does not return any rewards' do
         reward_service = described_class.new(12_345_678, %w(MUSIC SPORT))
-        expect { reward_service.rewards(eligibility_service) }.to raise('')
+        expect { reward_service.rewards(eligibility_service) }.to raise_error
       end
     end
 
@@ -147,13 +147,13 @@ describe Sky::RewardsService do
 
       before :each do
         allow(eligibility_service).to receive(:query)
-          .with(345_789).and_raise(account_number_invalid)
+          .with(345_789).and_raise(Sky::InvalidAccountNumberException.new)
       end
 
       it 'returns no rewards and informs the client a/c number is invalid' do
         reward_service = described_class.new(345_789, %w(MUSIC SPORT))
         expect { reward_service.rewards(eligibility_service) }
-          .to fail('INVALID_ACCOUNT_NUMBER')
+          .to raise_error('INVALID_ACCOUNT_NUMBER')
       end
     end
   end

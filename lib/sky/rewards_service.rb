@@ -6,12 +6,12 @@ module Sky
     end
 
     def rewards(service)
-      # begin
+      begin
         eligible_rewards if eligible?(service)
-      # rescue => error
-      #   require 'pry'; binding.pry
-      #   puts error
-      # end
+      rescue => error
+        require 'pry'; binding.pry
+        puts error.to_s
+      end
     end
 
     private
