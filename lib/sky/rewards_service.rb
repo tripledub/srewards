@@ -8,9 +8,8 @@ module Sky
     def rewards(service)
       begin
         eligible_rewards if eligible?(service)
-      rescue => error
-        require 'pry'; binding.pry
-        puts error.to_s
+      rescue Sky::TechnicalFailureException, Sky::InvalidAccountNumberException => error
+        error.message
       end
     end
 
