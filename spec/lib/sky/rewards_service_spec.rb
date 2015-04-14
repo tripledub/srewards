@@ -1,99 +1,159 @@
-require_relative "../../spec_helper"
+require_relative '../../spec_helper'
 
 describe Sky::RewardsService do
+  let(:eligibility_service) { double('Sky::DummyEligiblityService') }
 
-  let(:eligibility_service) { double("Sky::DummyEligiblityService") }
-
-  it "is a Sky::RewardsService object" do
-    expect(described_class.new(eligibility_service, 12345678)).to be_a(Sky::RewardsService)
+  it 'is a Sky::RewardsService object' do
+    expect(described_class.new(12_345_678, [])).to be_a(Sky::RewardsService)
   end
 
-  describe "#rewards" do
-    context "when the customer is eligible" do
+  describe '#rewards' do
+    context 'for an eligible customer account' do
       before :each do
-        allow(eligibility_service).to receive(:query).with(12345678).and_return("CUSTOMER_ELIGIBLE")
+        allow(eligibility_service).to receive(:query)
+          .with(12_345_678).and_return('CUSTOMER_ELIGIBLE')
       end
 
-      it "returns Champions League ticket when the customer subscribes to SPORT" do
-        reward_service = described_class.new(12345678,['SPORTS'])
-        expect(reward_service.rewards(eligibility_service)).to eq("CHAMPIONS_LEAGUE_FINAL_TICKET")
+      context 'when the customer subscribes to SPORT' do
+        it 'returns Champions League Ticket' do
+          reward_service = described_class.new(12_345_678, ['SPORTS'])
+          expect(reward_service.rewards(eligibility_service))
+            .to eq(['CHAMPIONS_LEAGUE_FINAL_TICKET'])
+        end
       end
 
-      it "returns Champions League ticket when the customer subscribes to SPORT & KIDS" do
-        reward_service = described_class.new(12345678,['SPORTS', 'KIDS'])
-        expect(reward_service.rewards(eligibility_service)).to eq("CHAMPIONS_LEAGUE_FINAL_TICKET")
+      context 'when the customer subscribes to SPORT & KIDS' do
+        it 'returns Champions League Ticket' do
+          reward_service = described_class.new(12_345_678, %w(SPORTS KIDS))
+          expect(reward_service.rewards(eligibility_service))
+            .to eq(['CHAMPIONS_LEAGUE_FINAL_TICKET'])
+        end
       end
 
-      it "returns Champions League ticket when the customer subscribes to SPORT & NEWS" do
-        reward_service = described_class.new(12345678,['SPORTS', 'NEWS'])
-        expect(reward_service.rewards(eligibility_service)).to eq("CHAMPIONS_LEAGUE_FINAL_TICKET")
+      context 'when the customer subscribes to SPORT & NEWS' do
+        it 'returns Champions League Ticket' do
+          reward_service = described_class.new(12_345_678, %w(SPORTS NEWS))
+          expect(reward_service.rewards(eligibility_service))
+            .to eq(['CHAMPIONS_LEAGUE_FINAL_TICKET'])
+        end
       end
 
-      it "returns two rewards when the customer subscribes to SPORT & MUSIC" do
-        reward_service = described_class.new(12345678,['SPORTS', 'MUSIC'])
-        expect(reward_service.rewards(eligibility_service)).to eq("CHAMPIONS_LEAGUE_FINAL_TICKET, KARAOKE_PRO_MICROPHONE")
+      context 'when the customer subscribes to MUSIC' do
+        it 'returns Karaoke Microphone' do
+          reward_service = described_class.new(12_345_678, %w(MUSIC))
+          expect(reward_service.rewards(eligibility_service))
+            .to eq(['KARAOKE_PRO_MICROPHONE'])
+        end
       end
 
-      it "returns three rewards when the customer subscribes to all packages" do
-        reward_service = described_class.new(12345678,['SPORTS','KIDS','MUSIC','NEWS','MOVIES'])
-        expect(reward_service.rewards(eligibility_service)).to eq("CHAMPIONS_LEAGUE_FINAL_TICKET, KARAOKE_PRO_MICROPHONE, PIRATES_OF_THE_CARIBBEAN_COLLECTION")
+      context 'when the customer subscribes to MUSIC & NEWS & KIDS' do
+        it 'returns Karaoke Microphone' do
+          reward_service = described_class.new(12_345_678, %w(MUSIC NEWS KIDS))
+          expect(reward_service.rewards(eligibility_service))
+            .to eq(['KARAOKE_PRO_MICROPHONE'])
+        end
       end
 
-      it "returns Karaoke Microphone when the customer subscribes to MUSIC" do
-        reward_service = described_class.new(12345678,['MUSIC'])
-        expect(reward_service.rewards(eligibility_service)).to eq("KARAOKE_PRO_MICROPHONE")
+      context 'when the customer subscribes to NEWS & KIDS' do
+        it 'returns no rewards' do
+          reward_service = described_class.new(12_345_678, %w(NEWS KIDS))
+          expect(reward_service.rewards(eligibility_service)).to eq([])
+        end
       end
 
-      it "returns Karaoke Microphone when the customer subscribes to MUSIC & NEWS & KIDS" do
-        reward_service = described_class.new(12345678,['MUSIC', 'NEWS', 'KIDS'])
-        expect(reward_service.rewards(eligibility_service)).to eq("KARAOKE_PRO_MICROPHONE")
+      context 'when the customer subscribes to SPORT & MUSIC' do
+        let(:reward_service) do
+          described_class.new(12_345_678, %w(SPORTS MUSIC))
+        end
+
+        it 'returns two rewards' do
+          expect(reward_service.rewards(eligibility_service).size).to eq(2)
+        end
+
+        it 'includes a Champions League Final Ticket' do
+          expect(reward_service.rewards(eligibility_service))
+            .to include('CHAMPIONS_LEAGUE_FINAL_TICKET')
+        end
+
+        it 'includes a Karaoke Pro Microphone' do
+          expect(reward_service.rewards(eligibility_service))
+            .to include('KARAOKE_PRO_MICROPHONE')
+        end
       end
 
-      it "returns no rewards when the customer subscribes to NEWS & KIDS" do
-        reward_service = described_class.new(12345678,['NEWS', 'KIDS'])
-        expect(reward_service.rewards(eligibility_service)).to eq("")
+      context 'when the customer is subscribed to all packages' do
+        let(:reward_service) do
+          described_class.new(12_345_678, %w(SPORTS KIDS MUSIC NEWS MOVIES))
+        end
+
+        it 'returns three rewards' do
+          expect(reward_service.rewards(eligibility_service).size).to eq(3)
+        end
+
+        it 'includes a Champions League Final Ticket' do
+          expect(reward_service.rewards(eligibility_service))
+            .to include('CHAMPIONS_LEAGUE_FINAL_TICKET')
+        end
+
+        it 'includes a Karaoke Pro Microphone' do
+          expect(reward_service.rewards(eligibility_service))
+            .to include('KARAOKE_PRO_MICROPHONE')
+        end
+
+        it 'includes the Pirates of the Carribean Collection' do
+          expect(reward_service.rewards(eligibility_service))
+            .to include('PIRATES_OF_THE_CARIBBEAN_COLLECTION')
+        end
       end
     end
 
-    context "when the customer is ineligible" do
+    context 'when the customer is ineligible' do
       before :each do
-        allow(eligibility_service).to receive(:query).with(12345678).and_return("CUSTOMER_INELIGIBLE")
+        allow(eligibility_service).to receive(:query)
+          .with(12_345_678).and_return('CUSTOMER_INELIGIBLE')
       end
 
-      it "returns no rewards when the customer subscribes to NEWS & KIDS" do
-        reward_service = described_class.new(12345678,['NEWS', 'KIDS'])
+      it 'returns no rewards when the customer subscribes to NEWS & KIDS' do
+        reward_service = described_class.new(12_345_678, %w(NEWS KIDS))
         expect(reward_service.rewards(eligibility_service)).to be_nil
       end
 
-      it "returns no rewards when the customer subscribes to MUSIC & SPORT" do
-        reward_service = described_class.new(12345678,['MUSIC', 'SPORT'])
+      it 'returns no rewards when the customer subscribes to MUSIC & SPORT' do
+        reward_service = described_class.new(12_345_678, %w(MUSIC SPORT))
         expect(reward_service.rewards(eligibility_service)).to be_nil
       end
     end
 
-    context "when there is a technical faliure exception" do
-      let(:technical_faliure_exception) { Sky::TechnicalFaliureException.new }
-
-      before :each do
-        allow(eligibility_service).to receive(:query).with(12345678).and_raise(technical_faliure_exception)
+    context 'when there is a technical faliure exception' do
+      let(:technical_faliure_exception) do
+        Sky::TechnicalFaliureException.new
       end
 
-      it "does not return any rewards" do
-        reward_service = described_class.new(12345678,['MUSIC', 'SPORT'])
-        expect(reward_service.rewards(eligibility_service)).to eq("")
+      before do
+        allow(eligibility_service).to receive(:query)
+          .with(12_345_678).and_raise(technical_faliure_exception)
+      end
+
+      it 'does not return any rewards' do
+        reward_service = described_class.new(12_345_678, %w(MUSIC SPORT))
+        expect { reward_service.rewards(eligibility_service) }.to raise('')
       end
     end
 
-    context "when the account number is invalid" do
-      let(:account_number_invalid) { Sky::InvalidAccountNumberException.new }
-
-      before :each do
-        allow(eligibility_service).to receive(:query).with('NaN').and_raise(account_number_invalid)
+    context 'when the account number is invalid' do
+      let(:account_number_invalid) do
+        Sky::InvalidAccountNumberException.new
       end
 
-      it "does not return any rewards and informs the client a/c number is invalid" do
-        reward_service = described_class.new('NaN', ['MUSIC', 'SPORT'])
-        expect(reward_service.rewards(eligibility_service)).to eq("INVALID_ACCOUNT_NUMBER")
+      before :each do
+        allow(eligibility_service).to receive(:query)
+          .with(345_789).and_raise(account_number_invalid)
+      end
+
+      it 'returns no rewards and informs the client a/c number is invalid' do
+        reward_service = described_class.new(345_789, %w(MUSIC SPORT))
+        expect { reward_service.rewards(eligibility_service) }
+          .to fail('INVALID_ACCOUNT_NUMBER')
       end
     end
   end
