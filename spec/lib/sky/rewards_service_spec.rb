@@ -124,14 +124,14 @@ describe Sky::RewardsService do
       end
     end
 
-    context 'when there is a technical faliure exception' do
-      let(:technical_faliure_exception) do
-        Sky::TechnicalFaliureException.new
+    context 'when there is a technical failure exception' do
+      let(:technical_failure_exception) do
+        Sky::TechnicalFailureException.new
       end
 
       before do
         allow(eligibility_service).to receive(:query)
-          .with(12_345_678).and_raise(technical_faliure_exception)
+          .with(12_345_678).and_raise(technical_failure_exception)
       end
 
       it 'does not return any rewards' do

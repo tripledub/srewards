@@ -9,5 +9,5 @@ module Sky
     end
   end
 
-  class TechnicalFaliureException < StandardError; end
+  class TechnicalFailureException < StandardError; end
 end

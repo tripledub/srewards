@@ -38,9 +38,5 @@ module Sky
     def eligible?(service)
       service.query(account_number) == 'CUSTOMER_ELIGIBLE'
     end
-
-    def handle_errors(error)
-      'INVALID_ACCOUNT_NUMBER'
-    end
   end
 end
